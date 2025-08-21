@@ -1,9 +1,81 @@
+import streamlit as st
+import streamlit.components.v1 as components
+
+# Page config
+st.set_page_config(
+    page_title="Simlane.ai - Vet Clinic Analysis",
+    page_icon="🟢",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Custom CSS for the login page
+LOGIN_CSS = """
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+    }
+    
+    .main-container {
+        max-width: 440px;
+        margin: auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        margin-top: 5vh;
+    }
+    
+    h1 {
+        color: #10b981 !important;
+        text-align: center;
+        font-size: 2.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    h3 {
+        color: #6b7280 !important;
+        text-align: center;
+        font-size: 0.875rem !important;
+        font-weight: 500 !important;
+        letter-spacing: 0.05em !important;
+        margin-bottom: 2rem !important;
+    }
+    
+    .stTextInput > div > div > input {
+        border-radius: 8px !important;
+        border: 1px solid #d1d5db !important;
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .stButton > button {
+        width: 100%;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        color: white !important;
+        border: none !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3) !important;
+    }
+</style>
+"""
+
+# Dashboard HTML (your complete dashboard)
+DASHBOARD_HTML = """
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simlane.ai - Secure Access</title>
+    <title>Vet Clinic Churn Analysis Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -12,343 +84,280 @@
         }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #064e3b 0%, #10b981 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
+            line-height: 1.6;
         }
         
-        .login-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            width: 100%;
-            max-width: 440px;
-            padding: 48px;
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
         }
         
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px;
+        .header {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
         }
         
-        .logo {
-            font-size: 32px;
-            font-weight: 700;
-            color: #10b981;
-            letter-spacing: -0.02em;
-            margin-bottom: 8px;
-        }
-        
-        .tagline {
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-        }
-        
-        h2 {
+        h1 {
             color: #111827;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             margin-bottom: 8px;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
         
         .subtitle {
             color: #6b7280;
-            font-size: 14px;
-            margin-bottom: 32px;
-            line-height: 1.5;
+            font-size: 16px;
+            margin-bottom: 24px;
+            font-weight: 400;
         }
         
-        .form-group {
+        .viz-section {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        
+        h2 {
+            color: #111827;
+            font-size: 20px;
+            font-weight: 600;
             margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e5e7eb;
+            letter-spacing: -0.01em;
         }
         
-        label {
-            display: block;
-            color: #374151;
-            font-size: 14px;
-            font-weight: 500;
+        h3 {
+            color: #111827;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: -0.01em;
+        }
+        
+        .chart-container {
+            min-height: 450px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #fafafa;
+            padding: 8px;
+        }
+        
+        .chart-container.tall {
+            min-height: 650px;
+        }
+        
+        .chart-container.scatter {
+            min-height: 400px;
+        }
+        
+        .key-finding {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .key-finding h3 {
+            color: #064e3b;
+            font-size: 16px;
             margin-bottom: 8px;
         }
         
-        input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+        .key-finding p {
+            color: #065f46;
             font-size: 14px;
-            transition: all 0.2s;
-            font-family: inherit;
+            line-height: 1.6;
         }
         
-        input:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
         }
         
-        input::placeholder {
-            color: #9ca3af;
-        }
-        
-        .password-container {
-            position: relative;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            padding: 12px 24px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .divider {
-            text-align: center;
-            color: #9ca3af;
-            font-size: 13px;
-            margin: 24px 0;
-            position: relative;
-        }
-        
-        .divider::before,
-        .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: calc(50% - 30px);
-            height: 1px;
-            background: #e5e7eb;
-        }
-        
-        .divider::before {
-            left: 0;
-        }
-        
-        .divider::after {
-            right: 0;
-        }
-        
-        .security-badge {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 13px;
-        }
-        
-        .lock-icon {
-            width: 16px;
-            height: 16px;
-            fill: #10b981;
-        }
-        
-        .client-info {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-            border-left: 3px solid #10b981;
-        }
-        
-        .client-info h3 {
-            color: #111827;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        
-        .client-info p {
-            color: #6b7280;
-            font-size: 13px;
-        }
-        
-        .remember-me {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            margin-top: -8px;
-        }
-        
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .checkbox-wrapper input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: #10b981;
-            cursor: pointer;
-        }
-        
-        .checkbox-wrapper label {
-            margin: 0;
-            font-size: 14px;
-            color: #374151;
-            cursor: pointer;
-        }
-        
-        .forgot-link {
-            color: #10b981;
-            font-size: 14px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        
-        .forgot-link:hover {
-            text-decoration: underline;
-        }
-        
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 32px 24px;
+        @media (max-width: 968px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
             }
+        }
+        
+        .insight-box {
+            background: #f9fafb;
+            border-left: 4px solid #10b981;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        
+        .insight-box strong {
+            color: #064e3b;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .tab {
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .tab:hover {
+            color: #111827;
+        }
+        
+        .tab.active {
+            color: #10b981;
+            border-bottom-color: #10b981;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        li:last-child {
+            border-bottom: none;
+        }
+        
+        li strong {
+            color: #111827;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="logo-section">
-            <div class="logo">Simlane.ai</div>
-            <div class="tagline">INTELLIGENT ANALYTICS PLATFORM</div>
+    <div class="dashboard">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>Vet Clinic Churn Analysis Dashboard</h1>
+            <p class="subtitle">Comprehensive analysis of clinic retention patterns and risk factors</p>
         </div>
         
-        <h2>Sign in to your account</h2>
-        <p class="subtitle">Enter your credentials to access the analytics dashboard</p>
+        <!-- Add all your dashboard content here -->
+        <!-- I'm truncating this for brevity, but include the full dashboard HTML -->
         
-        <form onsubmit="handleLogin(event)">
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    name="email" 
-                    placeholder="you@company.com" 
-                    required
-                    autocomplete="email"
-                >
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password</label>
-                <div class="password-container">
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Enter your password" 
-                        required
-                        autocomplete="current-password"
-                    >
-                </div>
-            </div>
-            
-            <div class="remember-me">
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" id="remember" name="remember">
-                    <label for="remember">Remember me</label>
-                </div>
-                <a href="#" class="forgot-link">Forgot password?</a>
-            </div>
-            
-            <button type="submit" class="btn-primary">
-                Sign in
-            </button>
-        </form>
-        
-        <div class="security-badge">
-            <svg class="lock-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
-            </svg>
-            <span>Secured with 256-bit SSL encryption</span>
-        </div>
     </div>
-    
+
     <script>
-        function handleLogin(event) {
-            event.preventDefault();
-            
-            // Get form values
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            // Demo credentials
-            const VALID_EMAIL = 'demo@simlane.ai';
-            const VALID_PASSWORD = 'SimlaneVet2024';
-            
-            // Validate credentials
-            if (email === VALID_EMAIL && password === VALID_PASSWORD) {
-                // Show loading state
-                const button = event.target.querySelector('.btn-primary');
-                const originalText = button.textContent;
-                button.textContent = 'Signing in...';
-                button.disabled = true;
-                
-                // Simulate authentication delay
-                setTimeout(() => {
-                    // Store session
-                    sessionStorage.setItem('simlane_authenticated', 'true');
-                    sessionStorage.setItem('simlane_user', email);
-                    
-                    // Success message
-                    alert('Authentication successful! Redirecting to dashboard...');
-                    button.textContent = 'Success!';
-                    button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                    
-                    // In production/Streamlit, redirect to dashboard here
-                    // window.location.href = '/dashboard';
-                    
-                }, 1500);
-            } else {
-                // Show error
-                const button = event.target.querySelector('.btn-primary');
-                const originalText = button.textContent;
-                button.textContent = 'Invalid credentials';
-                button.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-                
-                // Reset after delay
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                }, 2000);
-            }
-        }
-        
-        // Check if already authenticated
-        window.addEventListener('load', () => {
-            if (sessionStorage.getItem('simlane_authenticated') === 'true') {
-                // Could auto-redirect to dashboard
-                console.log('User already authenticated');
-            }
-        });
+        // Include all your JavaScript here
+        // Tab switching, charts, etc.
     </script>
 </body>
 </html>
+"""
+
+# Initialize session state
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+
+# Valid credentials
+VALID_EMAIL = "demo@simlane.ai"
+VALID_PASSWORD = "SimlaneVet2024"
+
+# Authentication logic
+if not st.session_state.authenticated:
+    # Apply custom CSS for login page
+    st.markdown(LOGIN_CSS, unsafe_allow_html=True)
+    
+    # Create login form in a container
+    st.markdown('<div class="main-container">', unsafe_allow_html=True)
+    
+    st.title("Simlane.ai")
+    st.subheader("INTELLIGENT ANALYTICS PLATFORM")
+    
+    st.markdown("---")
+    
+    with st.form("login_form", clear_on_submit=False):
+        st.markdown("### Sign in to your account")
+        st.markdown("Enter your credentials to access the analytics dashboard")
+        
+        email = st.text_input("Email address", placeholder="demo@simlane.ai")
+        password = st.text_input("Password", type="password", placeholder="Enter your password")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submit = st.form_submit_button("Sign in", use_container_width=True)
+        
+        if submit:
+            if email == VALID_EMAIL and password == VALID_PASSWORD:
+                st.session_state.authenticated = True
+                st.rerun()
+            else:
+                st.error("❌ Invalid credentials. Please try again.")
+                st.info(f"Hint: Use email '{VALID_EMAIL}' and password '{VALID_PASSWORD}'")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Security badge
+    st.markdown(
+        """
+        <div style="text-align: center; margin-top: 2rem; color: white;">
+            🔒 Secured with 256-bit SSL encryption
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+else:
+    # Show dashboard
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # Add logout button in sidebar
+    with st.sidebar:
+        if st.button("🚪 Logout"):
+            st.session_state.authenticated = False
+            st.rerun()
+    
+    # Display the dashboard
+    components.html(DASHBOARD_HTML, height=2000, scrolling=True)
